@@ -657,20 +657,51 @@ document.addEventListener('DOMContentLoaded', () => {
         // 從選定的列中隨機選擇4個符號位置
         const symbolsInColumn = symbolColumns[columnIndex];
         
-        // 隨機選擇起始位置 (確保有足夠的符號可選)
-        const maxStartIndex = symbolsInColumn.length - 4;
-        const startIndex = Math.floor(Math.random() * (maxStartIndex + 1));
+        // 隨機選擇4個不重複的符號
+        const availableSymbols = [...symbolsInColumn];
+        const selectedSymbols = [];
         
-        // 選擇連續的4個符號
-        const selectedSymbols = symbolsInColumn.slice(startIndex, startIndex + 4);
+        // 隨機選擇4個符號
+        for (let i = 0; i < 4; i++) {
+            const randomIndex = Math.floor(Math.random() * availableSymbols.length);
+            selectedSymbols.push(availableSymbols[randomIndex]);
+            availableSymbols.splice(randomIndex, 1); // 移除已選擇的符號
+        }
+        
+        // 打亂順序
+        const shuffledSymbols = [...selectedSymbols];
+        for (let i = shuffledSymbols.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledSymbols[i], shuffledSymbols[j]] = [shuffledSymbols[j], shuffledSymbols[i]];
+        }
+        
+        console.log("Selected symbols:", selectedSymbols);
+        console.log("Shuffled symbols:", shuffledSymbols);
+        
+        // 找出每個符號在原始列中的索引
+        const symbolIndices = shuffledSymbols.map(symbol => symbolsInColumn.indexOf(symbol));
+        console.log("Symbol indices in column:", symbolIndices);
+        
+        // 創建正確的按鍵順序 (按照符號在原始列中的索引從小到大排序)
+        const indexToPositionMap = {};
+        symbolIndices.forEach((index, position) => {
+            indexToPositionMap[index] = position;
+        });
+        
+        // 排序索引
+        const sortedIndices = [...symbolIndices].sort((a, b) => a - b);
+        
+        // 建立正確的按鍵順序
+        const correctSequence = sortedIndices.map(index => indexToPositionMap[index]);
+        console.log("Correct sequence:", correctSequence);
         
         // 創建模組狀態
         const moduleState = {
             index: moduleIndex,
             solved: false,
-            correctSequence: [0, 1, 2, 3], // 正確的按鍵順序
+            correctSequence: correctSequence,
             pressedButtons: [], // 已按下的按鍵
-            symbols: selectedSymbols
+            symbols: shuffledSymbols
         };
         
         gameState.modules.keyboards.push(moduleState);
@@ -680,12 +711,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const buttons = keyboardGrid.querySelectorAll('.keyboard-button');
         
         buttons.forEach((button, index) => {
-            button.textContent = selectedSymbols[index];
+            button.textContent = shuffledSymbols[index];
             
             button.addEventListener('click', () => {
                 if (moduleState.solved) return;
                 
-                // 記錄按下的按鈕
+                // 記錄按下的按鍵
                 moduleState.pressedButtons.push(parseInt(button.dataset.position));
 
                 console.log(moduleState.pressedButtons);
