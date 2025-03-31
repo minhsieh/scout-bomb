@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>無線電拆彈</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div id="start-screen" class="screen">
+            <h1>無線電拆彈</h1>
+            <div class="home-image-container">
+                <img src="/images/home-scout.PNG" alt="Scout Bomb" class="home-image" style="width: 250px;">
+            </div>
+            <p>這是一個合作遊戲，需要兩個人一起玩：</p>
+            <p>一個人是拆彈專家，負責拆除炸彈</p>
+            <p>一個人是指導員，擁有拆彈手冊</p>
+            <p>你們必須互相溝通，在時間結束前成功拆除炸彈！</p>
+            <button id="start-game">開始遊戲</button>
+            <button id="show-manual">查看拆彈手冊</button>
+            <button id="show-settings">遊戲設置</button>
+        </div>
+
+        <div id="settings-screen" class="screen hidden">
+            <h2>遊戲設置</h2>
+            <div class="settings-container">
+                <div class="setting-group">
+                    <label for="wire-modules">線路模組數量:</label>
+                    <select id="wire-modules">
+                        <option value="0">0</option>
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label for="button-modules">按鈕模組數量:</label>
+                    <select id="button-modules">
+                        <option value="0">0</option>
+                        <option value="1" selected>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label for="keyboard-modules">謎之鍵盤模組數量:</label>
+                    <select id="keyboard-modules">
+                        <option value="0" selected>0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label for="game-time">遊戲時間 (分鐘):</label>
+                    <select id="game-time">
+                        <option value="1">1</option>
+                        <option value="3" selected>3</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+            </div>
+            <button id="start-with-settings">開始遊戲</button>
+            <button id="back-to-main">返回主畫面</button>
+        </div>
+
+        <div id="game-screen" class="screen hidden">
+            <div class="game-header">
+                <h2>拆彈專家畫面</h2>
+                <div class="timer">時間: <span id="timer">03:00</span></div>
+            </div>
+            <div class="bomb-container">
+                <div class="module" id="wires-module">
+                    <h3>線路模組</h3>
+                    <div class="wires-container" id="wires">
+                        <!-- 線路會由JavaScript動態生成 -->
+                    </div>
+                    <button class="cut-button" id="cut-wire">剪斷線路</button>
+                </div>
+                <div class="module" id="button-module">
+                    <h3>按鈕模組</h3>
+                    <div class="big-button-container">
+                        <button id="big-button" class="big-button">按我</button>
+                        <div id="indicator-light" class="indicator-light hidden"></div>
+                    </div>
+                    <div class="hold-instructions hidden" id="hold-instructions">
+                        <p>依照指示燈顏色放開按鈕：</p>
+                        <ul>
+                            <li>藍色燈: 當秒數為4的倍數時放開</li>
+                            <li>黃色燈: 當秒數為5的倍數時放開</li>
+                            <li>其他顏色: 當秒數為3的倍數時放開</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="game-footer">
+                <div class="bomb-info">
+                    <p>序列號: <span id="serial-number">XZ3K29</span></p>
+                </div>
+                <button id="back-to-start">返回主畫面</button>
+            </div>
+        </div>
+
+        <div id="manual-screen" class="screen hidden">
+            <h2>拆彈手冊</h2>
+            <div class="manual-content">
+                <div class="manual-section">
+                    <h3>線路模組</h3>
+                    <p>模組中會有3至6條線路，顏色可能是紅色、藍色、黃色或黑色。</p>
+                    <p>根據線路的數量和顏色，決定要剪斷哪一條線路：</p>
+                    
+                    <div class="manual-subsection">
+                        <h4>3條線路</h4>
+                        <ul>
+                            <li>如果沒有紅線，剪斷第二條線。</li>
+                            <li>否則，如果最後一條線是白線，剪斷最後一條線。</li>
+                            <li>否則，如果有多於一條藍線，剪斷最後一條藍線。</li>
+                            <li>否則，剪斷最後一條線。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="manual-subsection">
+                        <h4>4條線路</h4>
+                        <ul>
+                            <li>如果有多於一條紅線，且序列號最後一位為奇數，剪斷最後一條紅線。</li>
+                            <li>否則，如果沒有紅線，且最後一條線是黃線，剪斷第一條線。</li>
+                            <li>否則，如果只有一條藍線，剪斷第一條線。</li>
+                            <li>否則，如果有多於一條黃線，剪斷最後一條線。</li>
+                            <li>否則，剪斷第二條線。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="manual-subsection">
+                        <h4>5條線路</h4>
+                        <ul>
+                            <li>如果最後一條線是黑線，且序列號最後一位為奇數，剪斷第四條線。</li>
+                            <li>否則，如果只有一條紅線，且黃線多於一條，剪斷第一條線。</li>
+                            <li>否則，如果沒有黑線，剪斷第二條線。</li>
+                            <li>否則，剪斷第一條線。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="manual-subsection">
+                        <h4>6條線路</h4>
+                        <ul>
+                            <li>如果沒有黃線，且序列號最後一位為奇數，剪斷第三條線。</li>
+                            <li>否則，如果只有一條黃線，且白線多於一條，剪斷第四條線。</li>
+                            <li>否則，如果沒有紅線，剪斷最後一條線。</li>
+                            <li>否則，剪斷第四條線。</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="manual-section">
+                    <h3>按鈕模組</h3>
+                    <p>模組中有一個大按鈕，可能是紅色、藍色、黃色或白色，上面可能寫著「按我」、「按下」、「點擊」或「壓下」。</p>
+                    <p>根據按鈕的顏色和文字，決定如何操作：</p>
+                    
+                    <div class="manual-subsection">
+                        <h4>按鈕是紅色</h4>
+                        <ul>
+                            <li>如果上面寫著「按下」，短按按鈕。</li>
+                            <li>否則，按住按鈕，並根據指示燈顏色在特定時機放開。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="manual-subsection">
+                        <h4>按鈕是藍色</h4>
+                        <ul>
+                            <li>如果上面寫著「點擊」，且序列號包含字母K，按住按鈕，並根據指示燈顏色在特定時機放開。</li>
+                            <li>否則，短按按鈕。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="manual-subsection">
+                        <h4>按鈕是黃色</h4>
+                        <ul>
+                            <li>如果上面寫著「壓下」，按住按鈕，並根據指示燈顏色在特定時機放開。</li>
+                            <li>否則，短按按鈕。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="manual-subsection">
+                        <h4>按鈕是白色</h4>
+                        <ul>
+                            <li>如果序列號包含字母A，且上面寫著「按我」，短按按鈕。</li>
+                            <li>否則，按住按鈕，並根據指示燈顏色在特定時機放開。</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="manual-section">
+                    <h3>謎之鍵盤模組</h3>
+                    <p>模組中有一個2x2的鍵盤，上面顯示著奇怪的符號。</p>
+                    <p>只有下列其中一種符號組合是正確的，你需要按照從上到下、從左到右的順序按下對應的四個按鈕。</p>
+                    
+                    <div class="manual-subsection">
+                        <h4>符號對照表</h4>
+                        <div class="symbol-grid">
+                            <div class="symbol-column">
+                                <div class="symbol">Ф</div>
+                                <div class="symbol">Λ</div>
+                                <div class="symbol">λ</div>
+                                <div class="symbol">ɹ</div>
+                                <div class="symbol">ɯ</div>
+                                <div class="symbol">ʒ</div>
+                                <div class="symbol">ǝ</div>
+                            </div>
+                            <div class="symbol-column">
+                                <div class="symbol">Ə</div>
+                                <div class="symbol">Ф</div>
+                                <div class="symbol">ǝ</div>
+                                <div class="symbol">ω</div>
+                                <div class="symbol">☆</div>
+                                <div class="symbol">ʒ</div>
+                                <div class="symbol">ɾ</div>
+                            </div>
+                            <div class="symbol-column">
+                                <div class="symbol">©</div>
+                                <div class="symbol">ω</div>
+                                <div class="symbol">Ω</div>
+                                <div class="symbol">Ж</div>
+                                <div class="symbol">Ʒ</div>
+                                <div class="symbol">λ</div>
+                                <div class="symbol">☆</div>
+                            </div>
+                            <div class="symbol-column">
+                                <div class="symbol">б</div>
+                                <div class="symbol">ɥ</div>
+                                <div class="symbol">Ъ</div>
+                                <div class="symbol">ɯ</div>
+                                <div class="symbol">Ж</div>
+                                <div class="symbol">ɾ</div>
+                                <div class="symbol">ψ</div>
+                            </div>
+                            <div class="symbol-column">
+                                <div class="symbol">Ψ</div>
+                                <div class="symbol">ψ</div>
+                                <div class="symbol">Ъ</div>
+                                <div class="symbol">Є</div>
+                                <div class="symbol">ɥ</div>
+                                <div class="symbol">Ʒ</div>
+                                <div class="symbol">★</div>
+                            </div>
+                            <div class="symbol-column">
+                                <div class="symbol">б</div>
+                                <div class="symbol">Ə</div>
+                                <div class="symbol">#</div>
+                                <div class="symbol">æ</div>
+                                <div class="symbol">Ψ</div>
+                                <div class="symbol">Й</div>
+                                <div class="symbol">Ω</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="manual-subsection">
+                        <h4>判斷規則</h4>
+                        <p>根據炸彈的序列號決定正確的符號組合：</p>
+                        <ul>
+                            <li>如果序列號包含字母A或Z，使用第一列符號。</li>
+                            <li>如果序列號包含數字1或7，使用第二列符號。</li>
+                            <li>如果序列號包含字母K或P，使用第三列符號。</li>
+                            <li>如果序列號包含數字3或9，使用第四列符號。</li>
+                            <li>如果序列號包含字母M或T，使用第五列符號。</li>
+                            <li>如果以上條件都不符合，使用第六列符號。</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button id="back-from-manual">返回主畫面</button>
+            </div>
+        </div>
+
+        <div id="result-screen" class="screen hidden">
+            <h2 id="result-title">遊戲結果</h2>
+            <p id="result-message"></p>
+            <button id="play-again">再玩一次</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

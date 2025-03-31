@@ -1,0 +1,420 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background-color: #f0f0f0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.screen {
+    padding: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+h1 {
+    color: #e74c3c;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #3498db;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+h4 {
+    color: #2c3e50;
+    margin: 10px 0;
+}
+
+p, li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+ul {
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    display: block;
+    margin: 15px auto;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+#start-screen {
+    text-align: center;
+}
+
+.home-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 15px 0;
+}
+
+.home-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 30px;
+}
+
+/* 設置畫面樣式 */
+#settings-screen {
+    text-align: center;
+}
+
+.settings-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.setting-group {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-group label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.setting-group select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    background-color: white;
+    font-size: 16px;
+    min-width: 100px;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.timer {
+    font-size: 24px;
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+.bomb-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.module {
+    width: 100%;
+    max-width: 350px;
+    border: 2px solid #2c3e50;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #ecf0f1;
+}
+
+.wires-container {
+    height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin-bottom: 15px;
+    position: relative;
+    background-color: #ddd;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.wire {
+    height: 8px;
+    margin: 5px 0;
+    position: relative;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.wire.red { background-color: #e74c3c; }
+.wire.blue { background-color: #3498db; }
+.wire.yellow { background-color: #f1c40f; }
+.wire.black { background-color: #2c3e50; }
+.wire.white { background-color: #ecf0f1; border: 1px solid #bdc3c7; }
+
+.wire.cut {
+    background-color: transparent !important;
+    border: none;
+}
+
+.wire.cut::before, .wire.cut::after {
+    content: '';
+    position: absolute;
+    height: 8px;
+    width: 45%;
+    top: 0;
+}
+
+.wire.red.cut::before, .wire.red.cut::after { background-color: #e74c3c; }
+.wire.blue.cut::before, .wire.blue.cut::after { background-color: #3498db; }
+.wire.yellow.cut::before, .wire.yellow.cut::after { background-color: #f1c40f; }
+.wire.black.cut::before, .wire.black.cut::after { background-color: #2c3e50; }
+.wire.white.cut::before, .wire.white.cut::after { 
+    background-color: #ecf0f1; 
+    border: 1px solid #bdc3c7; 
+    height: 6px;
+}
+
+.wire.cut::before {
+    left: 0;
+}
+
+.wire.cut::after {
+    right: 0;
+}
+
+.big-button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+}
+
+.big-button {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.big-button:active {
+    transform: translateY(5px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.big-button.red { background-color: #e74c3c; }
+.big-button.blue { background-color: #3498db; }
+.big-button.yellow { background-color: #f1c40f; }
+.big-button.white { background-color: #ecf0f1; color: #2c3e50; }
+
+.indicator-light {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin: 15px auto 0;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s;
+}
+
+.indicator-light.blue { background-color: #3498db; box-shadow: 0 0 15px #3498db; }
+.indicator-light.yellow { background-color: #f1c40f; box-shadow: 0 0 15px #f1c40f; }
+.indicator-light.white { background-color: #ecf0f1; box-shadow: 0 0 15px #ecf0f1; }
+
+.hold-instructions {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.game-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.bomb-info {
+    font-weight: bold;
+}
+
+.manual-content {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.manual-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.manual-section:last-child {
+    border-bottom: none;
+}
+
+.manual-subsection {
+    margin-left: 15px;
+    margin-bottom: 15px;
+}
+
+/* 謎之鍵盤模組樣式 */
+.keyboard-module {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.keyboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
+    margin: 15px 0;
+    width: 200px;
+    height: 200px;
+}
+
+.keyboard-button {
+    background-color: #f0f0f0;
+    border: 2px solid #2c3e50;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 36px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.keyboard-button:hover {
+    background-color: #e0e0e0;
+}
+
+.keyboard-button.pressed {
+    background-color: #bdc3c7;
+    transform: scale(0.95);
+}
+
+.keyboard-button.correct {
+    background-color: #2ecc71;
+}
+
+.keyboard-button.wrong {
+    background-color: #e74c3c;
+}
+
+/* 符號對照表樣式 */
+.symbol-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.symbol-column {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.symbol {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    border-bottom: 1px solid #ddd;
+}
+
+.symbol:last-child {
+    border-bottom: none;
+}
+
+/* 結果畫面樣式 */
+#result-screen {
+    text-align: center;
+    padding: 30px;
+}
+
+#result-title {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+#result-message {
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+/* 響應式設計 */
+@media (max-width: 600px) {
+    .container {
+        width: 95%;
+    }
+    
+    .game-header {
+        flex-direction: column;
+    }
+    
+    .module {
+        max-width: 100%;
+    }
+    
+    .big-button {
+        width: 120px;
+        height: 120px;
+    }
+}
