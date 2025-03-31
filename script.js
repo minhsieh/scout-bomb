@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 生成按鈕模組
     function generateButtonModule(moduleIndex) {
         const buttonColors = ['red', 'blue', 'yellow', 'white'];
-        const buttonTexts = ['按我', '按住', '點擊', '停止'];
+        const buttonTexts = ['按我', '按下', '點擊', '壓下'];
         
         const color = buttonColors[Math.floor(Math.random() * buttonColors.length)];
         const text = buttonTexts[Math.floor(Math.random() * buttonTexts.length)];
@@ -501,6 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const bigButton = document.getElementById(`big-button-${moduleIndex}`);
         const indicatorLight = document.getElementById(`indicator-light-${moduleIndex}`);
         const holdInstructions = document.getElementById(`hold-instructions-${moduleIndex}`);
+        const buttonModule = document.getElementById(`button-module-${moduleIndex}`);
         
         // 設置按鈕外觀
         bigButton.className = `big-button ${color}`;
@@ -552,17 +553,38 @@ document.addEventListener('DOMContentLoaded', () => {
     function determineCorrectButtonAction(moduleState) {
         const { color, text } = moduleState;
         const hasK = gameState.serialNumber.includes('K');
+        const hasA = gameState.serialNumber.includes('A');
         
-        if (color === 'red' && text === '按我') {
-            moduleState.correctAction = 'tap';
-        } else if (color === 'blue' && hasK) {
-            moduleState.correctAction = 'hold';
-        } else if (color === 'yellow' && text === '停止') {
-            moduleState.correctAction = 'tap';
-        } else if (color === 'white' && text === '按住') {
-            moduleState.correctAction = 'hold';
-        } else {
-            moduleState.correctAction = 'hold';
+        if (color === 'red') {
+            if (text === '按下') {
+                moduleState.correctAction = 'tap';
+            } else {
+                moduleState.correctAction = 'hold';
+            }
+        } else if (color === 'blue') {
+            if (text === '點擊' && hasK) {
+                moduleState.correctAction = 'hold';
+            } else {
+                moduleState.correctAction = 'tap';
+            }
+        } else if (color === 'yellow') {
+            if (text === '壓下') {
+                moduleState.correctAction = 'hold';
+            } else {
+                moduleState.correctAction = 'tap';
+            }
+        } else if (color === 'white') {
+            if (hasA && text === '按我') {
+                moduleState.correctAction = 'tap';
+            } else {
+                moduleState.correctAction = 'hold';
+            }
+        }
+        
+        // 如果需要按住，預先設定指示燈顏色
+        if (moduleState.correctAction === 'hold') {
+            const indicatorColors = ['blue', 'yellow', 'white'];
+            moduleState.indicatorColor = indicatorColors[Math.floor(Math.random() * indicatorColors.length)];
         }
     }
     
@@ -581,6 +603,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (moduleState.correctAction === 'tap') {
             moduleState.solved = true;
             gameState.solvedModules++;
+            
+            // 添加視覺反饋
+            const bigButton = document.getElementById(`big-button-${moduleState.index}`);
+            const buttonModule = document.getElementById(`button-module-${moduleState.index}`);
+            buttonModule.classList.add('module-solved');
+            bigButton.classList.add('button-solved');
+            bigButton.disabled = true;
+            
             checkGameCompletion();
             return;
         }
@@ -588,14 +618,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 否則顯示按住指示
         holdInstructions.classList.remove('hidden');
         
-        // 變更按鈕顏色以模擬指示燈
-        const indicatorColors = ['blue', 'yellow', 'white'];
-        const indicatorColor = indicatorColors[Math.floor(Math.random() * indicatorColors.length)];
-        moduleState.indicatorColor = indicatorColor;
-        
-        // 顯示指示燈並設置顏色
+        // 顯示指示燈並設置顏色 (使用預先設定的顏色)
         indicatorLight.classList.remove('hidden');
-        indicatorLight.className = `indicator-light ${indicatorColor}`;
+        indicatorLight.className = `indicator-light ${moduleState.indicatorColor}`;
     }
     
     // 釋放按鈕
@@ -604,8 +629,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        const bigButton = document.getElementById(`big-button-${moduleState.index}`);
         const indicatorLight = document.getElementById(`indicator-light-${moduleState.index}`);
         const holdInstructions = document.getElementById(`hold-instructions-${moduleState.index}`);
+        const buttonModule = document.getElementById(`button-module-${moduleState.index}`);
         
         moduleState.isHolding = false;
         holdInstructions.classList.add('hidden');
@@ -629,6 +656,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (correctRelease) {
                 moduleState.solved = true;
                 gameState.solvedModules++;
+                
+                // 添加視覺反饋
+                buttonModule.classList.add('module-solved');
+                bigButton.classList.add('button-solved');
+                bigButton.disabled = true;
+                
                 checkGameCompletion();
             } else {
                 endGame(false, '在錯誤的時間放開按鈕！炸彈爆炸了！');

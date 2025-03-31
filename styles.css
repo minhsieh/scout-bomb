@@ -184,6 +184,12 @@ button:hover {
     background-color: #ecf0f1;
 }
 
+.module-solved {
+    background-color: rgba(46, 204, 113, 0.2);
+    border-color: #2ecc71;
+    transition: background-color 0.5s, border-color 0.5s;
+}
+
 .wires-container {
     height: 200px;
     display: flex;
@@ -243,31 +249,56 @@ button:hover {
 
 .big-button-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    height: 200px;
+    margin: 15px 0;
 }
 
 .big-button {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    font-size: 24px;
+    border: 3px solid #2c3e50;
+    font-size: 18px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    transition: transform 0.1s, box-shadow 0.1s;
+    transition: all 0.2s;
+    position: relative;
 }
 
 .big-button:active {
-    transform: translateY(5px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transform: scale(0.95);
 }
 
-.big-button.red { background-color: #e74c3c; }
-.big-button.blue { background-color: #3498db; }
-.big-button.yellow { background-color: #f1c40f; }
-.big-button.white { background-color: #ecf0f1; color: #2c3e50; }
+.big-button.red {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.big-button.blue {
+    background-color: #3498db;
+    color: white;
+}
+
+.big-button.yellow {
+    background-color: #f1c40f;
+    color: black;
+}
+
+.big-button.white {
+    background-color: #ecf0f1;
+    color: black;
+}
+
+.button-solved {
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: 0 0 10px #2ecc71;
+}
+
+.button-solved:hover {
+    transform: none;
+}
 
 .indicator-light {
     width: 30px;
