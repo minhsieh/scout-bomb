@@ -243,14 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button id="big-button-${i}" class="big-button">按我</button>
                     <div id="indicator-light-${i}" class="indicator-light hidden"></div>
                 </div>
-                <div class="hold-instructions hidden" id="hold-instructions-${i}">
-                    <p>依照指示燈顏色放開按鈕：</p>
-                    <ul>
-                        <li>藍色燈: 當秒數為4的倍數時放開</li>
-                        <li>黃色燈: 當秒數為5的倍數時放開</li>
-                        <li>其他顏色: 當秒數為3的倍數時放開</li>
-                    </ul>
-                </div>
             `;
             bombContainer.appendChild(buttonModule);
         }
@@ -500,7 +492,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // 獲取元素
         const bigButton = document.getElementById(`big-button-${moduleIndex}`);
         const indicatorLight = document.getElementById(`indicator-light-${moduleIndex}`);
-        const holdInstructions = document.getElementById(`hold-instructions-${moduleIndex}`);
         const buttonModule = document.getElementById(`button-module-${moduleIndex}`);
         
         // 設置按鈕外觀
@@ -595,7 +586,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const indicatorLight = document.getElementById(`indicator-light-${moduleState.index}`);
-        const holdInstructions = document.getElementById(`hold-instructions-${moduleState.index}`);
         
         moduleState.isHolding = true;
         
@@ -615,9 +605,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // 否則顯示按住指示
-        holdInstructions.classList.remove('hidden');
-        
         // 顯示指示燈並設置顏色 (使用預先設定的顏色)
         indicatorLight.classList.remove('hidden');
         indicatorLight.className = `indicator-light ${moduleState.indicatorColor}`;
@@ -631,25 +618,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const bigButton = document.getElementById(`big-button-${moduleState.index}`);
         const indicatorLight = document.getElementById(`indicator-light-${moduleState.index}`);
-        const holdInstructions = document.getElementById(`hold-instructions-${moduleState.index}`);
         const buttonModule = document.getElementById(`button-module-${moduleState.index}`);
         
         moduleState.isHolding = false;
-        holdInstructions.classList.add('hidden');
         indicatorLight.classList.add('hidden');
         
         // 如果正確操作是按住，則檢查釋放時機
         if (moduleState.correctAction === 'hold') {
             const seconds = gameState.timer % 60;
+            const lastDigit = seconds % 10; // 取得秒數的最後一位數
             const indicatorColor = moduleState.indicatorColor;
             
             let correctRelease = false;
             
-            if (indicatorColor === 'blue' && seconds % 4 === 0) {
+            if (indicatorColor === 'blue' && lastDigit === 4) {
                 correctRelease = true;
-            } else if (indicatorColor === 'yellow' && seconds % 5 === 0) {
+            } else if (indicatorColor === 'yellow' && lastDigit === 5) {
                 correctRelease = true;
-            } else if (seconds % 3 === 0) {
+            } else if (lastDigit === 3) {
                 correctRelease = true;
             }
             
