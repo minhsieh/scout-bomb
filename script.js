@@ -842,18 +842,97 @@ document.addEventListener('DOMContentLoaded', () => {
     function endGame(success, message) {
         stopTimer();
         
-        gameScreen.classList.add('hidden');
-        resultScreen.classList.remove('hidden');
-        
         if (success) {
             resultTitle.textContent = '任務成功！';
             resultTitle.style.color = '#27ae60';
+            
+            // 直接顯示結果畫面
+            gameScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
         } else {
-            resultTitle.textContent = '任務失敗！';
-            resultTitle.style.color = '#e74c3c';
+            // 爆炸音效
+            playExplosionSound();
+
+            // 爆炸動畫
+            const explosionContainer = document.getElementById('explosion-container');
+            const explosion = explosionContainer.querySelector('.explosion');
+            
+            // 震動效果
+            gameScreen.classList.add('shake');
+            
+            // 顯示爆炸動畫
+            explosionContainer.classList.remove('hidden');
+            
+            // 添加動畫類別
+            explosion.classList.add('animate');
+            
+            // 創建爆炸粒子
+            createExplosionParticles(explosionContainer);
+            
+            // 延遲顯示結果畫面
+            setTimeout(() => {
+                gameScreen.classList.remove('shake');
+                gameScreen.classList.add('hidden');
+                explosionContainer.classList.add('hidden');
+                explosion.classList.remove('animate'); // 移除動畫類別以便下次使用
+                resultScreen.classList.remove('hidden');
+                
+                resultTitle.textContent = '任務失敗！';
+                resultTitle.style.color = '#e74c3c';
+            }, 1500);
         }
         
         resultMessage.textContent = message;
+    }
+    
+    // 創建爆炸粒子
+    function createExplosionParticles(container) {
+        // 創建20個爆炸粒子
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'explosion-particle';
+            
+            // 隨機大小
+            const size = Math.random() * 15 + 5;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            
+            // 隨機顏色
+            const colors = ['#ff5722', '#ff9800', '#ffc107', '#ffeb3b'];
+            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 隨機位置
+            particle.style.left = '50%';
+            particle.style.top = '50%';
+            
+            // 隨機方向
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 50 + Math.random() * 150;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            // 設置CSS變數用於動畫
+            particle.style.setProperty('--tx', `${tx}px`);
+            particle.style.setProperty('--ty', `${ty}px`);
+            
+            container.appendChild(particle);
+            
+            // 動畫結束後移除粒子
+            particle.addEventListener('animationend', () => {
+                particle.remove();
+            });
+        }
+    }
+    
+    // 播放爆炸音效
+    function playExplosionSound() {
+        try {
+            const audio = new Audio('sounds/explosion.mp3');
+            audio.volume = 0.5;
+            audio.play().catch(e => console.log('無法播放音效:', e));
+        } catch (e) {
+            console.log('音效播放錯誤:', e);
+        }
     }
     
     // 初始化遊戲
