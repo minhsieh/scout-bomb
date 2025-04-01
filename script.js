@@ -474,6 +474,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (selectedWire === moduleState.correctWire) {
             moduleState.solved = true;
             gameState.solvedModules++;
+            
+            // 添加視覺反饋
+            const wireModule = document.getElementById(`wires-module-${moduleState.index}`);
+            const cutWireBtn = document.getElementById(`cut-wire-${moduleState.index}`);
+            
+            wireModule.classList.add('module-solved');
+            cutWireBtn.classList.add('button-solved');
+            cutWireBtn.disabled = true;
+            
             checkGameCompletion();
         } else {
             // 錯誤 - 遊戲結束
