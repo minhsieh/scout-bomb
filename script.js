@@ -31,6 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultTitle = document.getElementById('result-title');
     const resultMessage = document.getElementById('result-message');
     
+    // 創建通知元素
+    const notificationDiv = document.createElement('div');
+    notificationDiv.className = 'notification';
+    document.body.appendChild(notificationDiv);
+    
     // 遊戲狀態
     let gameState = {
         timer: 180, // 預設3分鐘
@@ -89,6 +94,22 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('bombGameSettings', JSON.stringify(settings));
     }
     
+    // 顯示通知
+    function showNotification(message, type = 'success', duration = 3000) {
+        notificationDiv.textContent = message;
+        notificationDiv.className = 'notification ' + type;
+        
+        // 顯示通知
+        setTimeout(() => {
+            notificationDiv.classList.add('show');
+        }, 10);
+        
+        // 設定自動隱藏
+        setTimeout(() => {
+            notificationDiv.classList.remove('show');
+        }, duration);
+    }
+    
     // 初始化事件監聽器
     function initEventListeners() {
         startGameBtn.addEventListener('click', () => {
@@ -114,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         startWithSettingsBtn.addEventListener('click', () => {
             saveSettings();
-            startGame();
+            showNotification('設定已儲存成功！');
         });
         
         backToMainBtn.addEventListener('click', () => {
