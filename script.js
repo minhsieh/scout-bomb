@@ -19,9 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const buttonModulesSelect = document.getElementById('button-modules');
     const keyboardModulesSelect = document.getElementById('keyboard-modules');
     const gameTimeSelect = document.getElementById('game-time');
+    const maxFailuresSelect = document.getElementById('max-failures');
     
     const timerDisplay = document.getElementById('timer');
     const serialNumberDisplay = document.getElementById('serial-number');
+    const failureCounterDisplay = document.getElementById('failure-counter');
     const wiresContainer = document.getElementById('wires');
     const cutWireBtn = document.getElementById('cut-wire');
     const bigButton = document.getElementById('big-button');
@@ -44,6 +46,8 @@ document.addEventListener('DOMContentLoaded', () => {
         wireModulesCount: 1, // 預設1個線路模組
         buttonModulesCount: 1, // 預設1個按鈕模組
         keyboardModulesCount: 0, // 預設0個謎之鍵盤模組
+        maxFailures: 3, // 預設最多可以失敗3次
+        currentFailures: 0, // 目前失敗次數
         modules: {
             wires: [],
             buttons: [],
@@ -74,11 +78,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 keyboardModulesSelect.value = settings.keyboardModules;
             }
             gameTimeSelect.value = settings.gameTime;
+            if (settings.maxFailures) {
+                maxFailuresSelect.value = settings.maxFailures;
+            }
             
             gameState.wireModulesCount = parseInt(settings.wireModules);
             gameState.buttonModulesCount = parseInt(settings.buttonModules);
             gameState.keyboardModulesCount = parseInt(settings.keyboardModules || 0);
             gameState.timer = parseInt(settings.gameTime) * 60;
+            gameState.maxFailures = parseInt(settings.maxFailures || 3);
             gameState.totalModules = gameState.wireModulesCount + gameState.buttonModulesCount + gameState.keyboardModulesCount;
         }
     }
@@ -89,24 +97,39 @@ document.addEventListener('DOMContentLoaded', () => {
             wireModules: wireModulesSelect.value,
             buttonModules: buttonModulesSelect.value,
             keyboardModules: keyboardModulesSelect.value,
-            gameTime: gameTimeSelect.value
+            gameTime: gameTimeSelect.value,
+            maxFailures: maxFailuresSelect.value
         };
         localStorage.setItem('bombGameSettings', JSON.stringify(settings));
     }
     
     // 顯示通知
     function showNotification(message, type = 'success', duration = 3000) {
+        // 清除之前的通知計時器
+        if (window.notificationTimer) {
+            clearTimeout(window.notificationTimer);
+        }
+        
+        // 設置通知內容和樣式
         notificationDiv.textContent = message;
         notificationDiv.className = 'notification ' + type;
         
-        // 顯示通知
-        setTimeout(() => {
-            notificationDiv.classList.add('show');
-        }, 10);
+        // 顯示通知（使用 requestAnimationFrame 確保 DOM 更新）
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                notificationDiv.classList.add('show');
+            });
+        });
         
         // 設定自動隱藏
-        setTimeout(() => {
+        window.notificationTimer = setTimeout(() => {
             notificationDiv.classList.remove('show');
+            
+            // 完全移除通知內容
+            setTimeout(() => {
+                notificationDiv.textContent = '';
+                notificationDiv.className = 'notification';
+            }, 400); // 等待淡出動畫完成
         }, duration);
     }
     
@@ -168,6 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         buttonModulesSelect.addEventListener('change', saveSettings);
         keyboardModulesSelect.addEventListener('change', saveSettings);
         gameTimeSelect.addEventListener('change', saveSettings);
+        maxFailuresSelect.addEventListener('change', saveSettings);
     }
     
     // 顯示手冊
@@ -199,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gameState.buttonModulesCount = parseInt(buttonModulesSelect.value);
             gameState.keyboardModulesCount = parseInt(keyboardModulesSelect.value);
             gameState.timer = parseInt(gameTimeSelect.value) * 60;
+            gameState.maxFailures = parseInt(maxFailuresSelect.value);
             gameState.totalModules = gameState.wireModulesCount + gameState.buttonModulesCount + gameState.keyboardModulesCount;
         }
         
@@ -225,7 +250,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 重置遊戲狀態
     function resetGameState() {
-        gameState.timerInterval = null;
         gameState.serialNumber = '';
         gameState.modules = {
             wires: [],
@@ -233,8 +257,19 @@ document.addEventListener('DOMContentLoaded', () => {
             keyboards: []
         };
         gameState.solvedModules = 0;
+        gameState.currentFailures = 0;
         
-        // 重置UI
+        // 更新失敗次數顯示
+        updateFailureDisplay();
+        
+        // 停止計時器（如果正在運行）
+        if (gameState.timerInterval) {
+            clearInterval(gameState.timerInterval);
+            gameState.timerInterval = null;
+        }
+        
+        // 重置計時器
+        gameState.timer = parseInt(gameTimeSelect.value) * 60;
         updateTimerDisplay();
         
         // 清空模組容器
@@ -506,9 +541,38 @@ document.addEventListener('DOMContentLoaded', () => {
             
             checkGameCompletion();
         } else {
-            // 錯誤 - 遊戲結束
-            endGame(false, '剪錯線路！炸彈爆炸了！');
+            // 錯誤 - 處理失敗
+            if (handleFailure('剪錯線路！')) {
+                return; // 如果炸彈爆炸，直接返回
+            }
         }
+    }
+    
+    // 處理失敗
+    function handleFailure(message) {
+        gameState.currentFailures++;
+        updateFailureDisplay();
+        
+        // 視覺反饋 - 讓失敗計數器閃爍
+        failureCounterDisplay.parentElement.classList.add('failure-flash');
+        setTimeout(() => {
+            failureCounterDisplay.parentElement.classList.remove('failure-flash');
+        }, 1000);
+        
+        // 檢查是否達到最大失敗次數
+        if (gameState.currentFailures >= gameState.maxFailures) {
+            endGame(false, message || '失敗次數過多，炸彈爆炸！');
+            return true;
+        }
+        
+        // 未達到最大失敗次數，顯示警告
+        showNotification(`${message || '操作錯誤！'} (失誤: ${gameState.currentFailures}/${gameState.maxFailures})`, 'error');
+        return false;
+    }
+    
+    // 更新失敗次數顯示
+    function updateFailureDisplay() {
+        failureCounterDisplay.textContent = `${gameState.currentFailures}/${gameState.maxFailures}`;
     }
     
     // 生成按鈕模組
@@ -626,7 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 添加視覺反饋
             const bigButton = document.getElementById(`big-button-${moduleState.index}`);
-            const buttonModule = document.getElementById(`button-module-${moduleState.index}`);
+            const buttonModule = document.getElementById(`button-module-${moduleIndex}`);
             buttonModule.classList.add('module-solved');
             bigButton.classList.add('button-solved');
             bigButton.disabled = true;
@@ -680,7 +744,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 checkGameCompletion();
             } else {
-                endGame(false, '在錯誤的時間放開按鈕！炸彈爆炸了！');
+                // 處理失敗
+                if (handleFailure('在錯誤的時間放開按鈕！')) {
+                    return; // 如果炸彈爆炸，直接返回
+                }
             }
         }
     }
@@ -815,13 +882,20 @@ document.addEventListener('DOMContentLoaded', () => {
             // 檢查是否完成所有模組
             checkGameCompletion();
         } else {
-            // 順序錯誤，炸彈爆炸
+            // 順序錯誤，處理失敗
+            if (handleFailure('按鍵順序錯誤！')) {
+                return; // 如果炸彈爆炸，直接返回
+            }
+            
+            // 視覺反饋
             buttons.forEach(button => {
                 button.classList.add('wrong');
             });
             
             setTimeout(() => {
-                endGame(false, '按鍵順序錯誤！炸彈爆炸了！');
+                buttons.forEach(button => {
+                    button.classList.remove('wrong');
+                });
             }, 500);
         }
     }
@@ -841,7 +915,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateTimerDisplay();
             
             if (gameState.timer <= 0) {
-                endGame(false, '時間到！炸彈爆炸了！');
+                endGame(false, '時間到！炸彈爆炸！');
             }
         }, 1000);
     }

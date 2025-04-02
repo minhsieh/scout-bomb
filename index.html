@@ -62,6 +62,15 @@
                         <option value="5">5</option>
                     </select>
                 </div>
+                <div class="setting-group">
+                    <label for="max-failures">最大失誤次數:</label>
+                    <select id="max-failures">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3" selected>3</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
             </div>
             <button id="start-with-settings">儲存設定</button>
             <button id="back-to-main">返回主畫面</button>
@@ -73,6 +82,7 @@
                 <div class="game-info">
                     <div class="timer">時間: <span id="timer">03:00</span></div>
                     <div class="serial">序列號: <span id="serial-number">XZ3K29</span></div>
+                    <div class="failures">失誤: <span id="failure-counter">0/3</span></div>
                 </div>
             </div>
             <div class="bomb-container">

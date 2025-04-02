@@ -447,6 +447,62 @@ button:hover {
     margin-bottom: 30px;
 }
 
+/* 通知樣式 */
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-align: center;
+    min-width: 200px;
+    max-width: 80%;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.notification.success {
+    background-color: #2ecc71;
+    border-left: 5px solid #27ae60;
+}
+
+.notification.error {
+    background-color: #e74c3c;
+    border-left: 5px solid #c0392b;
+}
+
+/* 失敗計數器閃爍效果 */
+@keyframes failureFlash {
+    0%, 100% { background-color: transparent; }
+    50% { background-color: rgba(231, 76, 60, 0.7); }
+}
+
+.failure-flash {
+    animation: failureFlash 0.8s ease-in-out;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin: -2px -6px;
+}
+
+/* 失敗計數器樣式 */
+.failures {
+    font-weight: bold;
+}
+
+.failures span {
+    color: #e74c3c;
+}
+
 /* 響應式設計 */
 @media (max-width: 600px) {
     .container {
@@ -556,32 +612,4 @@ button:hover {
     0%, 100% { transform: translateX(0); }
     10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
     20%, 40%, 60%, 80% { transform: translateX(10px); }
-}
-
-/* 通知樣式 */
-.notification {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    border-radius: 5px;
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-
-.notification.show {
-    opacity: 1;
-}
-
-.notification.success {
-    background-color: #2ecc71;
-}
-
-.notification.error {
-    background-color: #e74c3c;
 }
