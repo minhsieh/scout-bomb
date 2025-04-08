@@ -172,19 +172,20 @@ document.addEventListener('DOMContentLoaded', () => {
         
         cutWireBtn.addEventListener('click', cutSelectedWire);
         
-        bigButton.addEventListener('mousedown', holdButton);
-        bigButton.addEventListener('mouseup', releaseButton);
-        bigButton.addEventListener('mouseleave', releaseButton);
+        // 移除全局按鈕事件監聽器，因為每個按鈕模組都有自己的事件監聽器
+        // bigButton.addEventListener('mousedown', holdButton);
+        // bigButton.addEventListener('mouseup', releaseButton);
+        // bigButton.addEventListener('mouseleave', releaseButton);
         
-        // 觸控設備支援
-        bigButton.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            holdButton();
-        });
-        bigButton.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            releaseButton();
-        });
+        // // 觸控設備支援
+        // bigButton.addEventListener('touchstart', (e) => {
+        //     e.preventDefault();
+        //     holdButton();
+        // });
+        // bigButton.addEventListener('touchend', (e) => {
+        //     e.preventDefault();
+        //     releaseButton();
+        // });
         
         // 設置變更時保存
         wireModulesSelect.addEventListener('change', saveSettings);
@@ -608,26 +609,26 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // 添加按鈕事件
         bigButton.addEventListener('mousedown', () => {
-            holdButtonModule(moduleState);
+            holdButton(moduleState);
         });
         
         bigButton.addEventListener('mouseup', () => {
-            releaseButtonModule(moduleState);
+            releaseButton(moduleState);
         });
         
         bigButton.addEventListener('mouseleave', () => {
-            releaseButtonModule(moduleState);
+            releaseButton(moduleState);
         });
         
         // 觸控設備支援
         bigButton.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            holdButtonModule(moduleState);
+            holdButton(moduleState);
         });
         
         bigButton.addEventListener('touchend', (e) => {
             e.preventDefault();
-            releaseButtonModule(moduleState);
+            releaseButton(moduleState);
         });
         
         // 添加到遊戲狀態
@@ -674,7 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 按住按鈕
-    function holdButtonModule(moduleState) {
+    function holdButton(moduleState) {
         if (moduleState.solved) {
             return; // 模組已解決
         }
@@ -690,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 添加視覺反饋
             const bigButton = document.getElementById(`big-button-${moduleState.index}`);
-            const buttonModule = document.getElementById(`button-module-${moduleIndex}`);
+            const buttonModule = document.getElementById(`button-module-${moduleState.index}`);
             buttonModule.classList.add('module-solved');
             bigButton.classList.add('button-solved');
             bigButton.disabled = true;
@@ -705,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 釋放按鈕
-    function releaseButtonModule(moduleState) {
+    function releaseButton(moduleState) {
         if (!moduleState.isHolding || moduleState.solved) {
             return;
         }
